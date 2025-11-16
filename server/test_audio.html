@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Audio Chunk Tester</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    .section {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #f5f5f5;
+      border-radius: 8px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      background: #4ade80;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      background: #22c55e;
+    }
+    button.red {
+      background: #ef4444;
+    }
+    button.red:hover {
+      background: #dc2626;
+    }
+    #output {
+      background: white;
+      padding: 15px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    #audioPlayer {
+      width: 100%;
+      margin-top: 10px;
+    }
+    .info {
+      background: #e3f2fd;
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Audio Chunk Tester</h1>
+
+  <div class="section">
+    <h3>Upload Audio File</h3>
+    <input type="file" id="audioFile" accept="audio/*" />
+    <button onclick="sendAudioFile()">Send to Server</button>
+  </div>
+
+  <div class="section">
+    <h3>Received Audio Chunks</h3>
+    <div class="info">
+      Connect to WebSocket and listen for audio chunks from the extension
+    </div>
+    <button onclick="connectWebSocket()">Connect to Server</button>
+    <button class="red" onclick="disconnectWebSocket()">Disconnect</button>
+    <div id="output"></div>
+  </div>
+
+  <div class="section">
+    <h3>Play Last Chunk</h3>
+    <audio id="audioPlayer" controls></audio>
+    <button onclick="playLastChunk()">Play Last Chunk</button>
+    <button onclick="downloadLastChunk()">Download Last Chunk</button>
+  </div>
+
+  <script>
+    let ws = null;
+    let audioChunks = [];
+    const output = document.getElementById('output');
+    const audioPlayer = document.getElementById('audioPlayer');
+
+    function log(msg) {
+      const timestamp = new Date().toLocaleTimeString();
+      output.innerHTML += `[${timestamp}] ${msg}<br>`;
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function connectWebSocket() {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        log('Already connected');
+        return;
+      }
+
+      ws = new WebSocket('ws://localhost:8000/ws');
+      ws.binaryType = 'arraybuffer';
+
+      ws.onopen = () => {
+        log('✅ Connected to server');
+      };
+
+      ws.onmessage = (event) => {
+        if (event.data instanceof ArrayBuffer) {
+          // Binary audio chunk
+          audioChunks.push(new Uint8Array(event.data));
+          log(`📦 Received audio chunk: ${event.data.byteLength} bytes (Total: ${audioChunks.length} chunks)`);
+        } else {
+          // Text message (ASR response)
+          try {
+            const data = JSON.parse(event.data);
+            log(`📝 ${data.type.toUpperCase()}: ${data.text}`);
+          } catch (e) {
+            log(`📨 ${event.data}`);
+          }
+        }
+      };
+
+      ws.onerror = (error) => {
+        log(`❌ Error: ${error.message}`);
+      };
+
+      ws.onclose = () => {
+        log('🔌 Disconnected from server');
+      };
+    }
+
+    function disconnectWebSocket() {
+      if (ws) {
+        ws.close();
+      }
+    }
+
+    async function sendAudioFile() {
+      const fileInput = document.getElementById('audioFile');
+      const file = fileInput.files[0];
+
+      if (!file) {
+        alert('Please select an audio file');
+        return;
+      }
+
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        alert('Not connected to server. Click "Connect to Server" first.');
+        return;
+      }
+
+      log(`📤 Sending file: ${file.name} (${file.size} bytes)`);
+
+      const buffer = await file.arrayBuffer();
+      ws.send(buffer);
+
+      log('✅ File sent to server');
+    }
+
+    function playLastChunk() {
+      if (audioChunks.length === 0) {
+        alert('No audio chunks received');
+        return;
+      }
+
+      const lastChunk = audioChunks[audioChunks.length - 1];
+      const blob = new Blob([lastChunk], { type: 'audio/webm' });
+      const url = URL.createObjectURL(blob);
+
+      audioPlayer.src = url;
+      audioPlayer.play();
+
+      log(`🎵 Playing chunk #${audioChunks.length}`);
+    }
+
+    function downloadLastChunk() {
+      if (audioChunks.length === 0) {
+        alert('No audio chunks received');
+        return;
+      }
+
+      const lastChunk = audioChunks[audioChunks.length - 1];
+      const blob = new Blob([lastChunk], { type: 'audio/webm' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `chunk_${audioChunks.length}.webm`;
+      a.click();
+
+      log(`📥 Downloaded chunk #${audioChunks.length}`);
+    }
+  </script>
+</body>
+</html>

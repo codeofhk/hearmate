@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+websockets
+python-multipart
+pydub
+soundfile
+numpy
+openai-whispher
+openai

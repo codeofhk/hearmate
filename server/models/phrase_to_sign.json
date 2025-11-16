@@ -1,0 +1,6 @@
+{
+  "hello": [{"sign":"sign_hello","duration":1.0}],
+  "thank you": [{"sign":"sign_thank","duration":1.0}],
+  "poetry": [{"sign":"sign_poem","duration":1.6}],
+  "i love you": [{"sign":"sign_i_love_you","duration":1.5}]
+}
