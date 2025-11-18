@@ -48,8 +48,8 @@ class ASRProcessor:
                 
                 logger.info(f"Audio buffer: {len(self.audio_buffer)} samples (~{len(self.audio_buffer)/self.sample_rate:.1f}s)")
                 
-                # Process every 5 sec.onds of audio
-                if len(self.audio_buffer) >= self.sample_rate * 5:
+                # Process every 1 second of audio
+                if len(self.audio_buffer) >= self.sample_rate * 1 :
                     return await self._transcribe_buffer()
                 else:
                     return [{"type": "interim", "text": f"Listening... ({self.chunk_count} chunks)"}]

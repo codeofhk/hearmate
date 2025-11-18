@@ -84,7 +84,7 @@ class LetterSignGifGenerator:
             if not gif_path:
                 return {"error": "Failed to create GIF"}
             
-            os.system(f"open {gif_path}")
+            #os.system(f"open {gif_path}")
             
             return {
                 "success": True,
@@ -99,7 +99,7 @@ class LetterSignGifGenerator:
             logger.error(f"GIF generation error: {e}", exc_info=True)
             return {"error": str(e)}
     
-    async def _create_letter_gif(self, letters: List[str], duration_per_letter: float) -> Optional[str]:
+    async def _create_letter_gif(self, letters: List[str], duration_per_letter: float = 0.5) -> Optional[str]:
         """Create GIF from letter images"""
         try:
             filename = f"sign_{datetime.now().strftime('%Y%m%d_%H%M%S')}.gif"
@@ -286,7 +286,7 @@ if __name__ == "__main__":
     import asyncio
     
     async def test():
-        generator = LetterSignGifGenerator(letters_dir="/Users/hk/Downloads/letters")
+        generator = LetterSignGifGenerator(letters_dir="/Users/hk/hci/server/static/letter_signs")
         result = await generator.text_to_gif("hello", duration_per_letter=0.5)
         print(result)
     

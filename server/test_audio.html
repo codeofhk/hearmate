@@ -1,198 +1,697 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Audio Chunk Tester</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Language Translator - Test</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
     body {
-      font-family: Arial, sans-serif;
-      max-width: 800px;
-      margin: 50px auto;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       padding: 20px;
     }
-    .section {
-      margin-bottom: 20px;
-      padding: 15px;
-      background: #f5f5f5;
-      border-radius: 8px;
+    
+    .container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 900px;
+      width: 100%;
+      padding: 40px;
     }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 30px;
+      text-align: center;
+      font-size: 2.5em;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .tab-btn {
+      padding: 12px 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      color: #999;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+    }
+    
+    .tab-btn.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+    
+    .tab-btn:hover {
+      color: #667eea;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .section {
+      margin-bottom: 30px;
+    }
+    
+    .section-title {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 1.2em;
+      font-weight: 600;
+    }
+    
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    input[type="text"],
+    input[type="file"],
+    input[type="range"] {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    input[type="text"]:focus,
+    input[type="file"]:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    input[type="range"] {
+      flex: 0.3;
+      padding: 0;
+      cursor: pointer;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    
     button {
-      padding: 10px 20px;
-      margin: 5px;
-      background: #4ade80;
+      padding: 12px 30px;
+      background: #667eea;
       color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
+    
     button:hover {
-      background: #22c55e;
+      background: #764ba2;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
     }
-    button.red {
-      background: #ef4444;
+    
+    button:active {
+      transform: translateY(0);
     }
-    button.red:hover {
-      background: #dc2626;
+    
+    button.secondary {
+      background: #e0e0e0;
+      color: #333;
     }
-    #output {
+    
+    button.secondary:hover {
+      background: #d0d0d0;
+      box-shadow: none;
+    }
+    
+    button.danger {
+      background: #ff6b6b;
+    }
+    
+    button.danger:hover {
+      background: #ff5252;
+    }
+    
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .status {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: 500;
+      display: none;
+    }
+    
+    .status.show {
+      display: block;
+    }
+    
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .status.info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+    
+    .output-section {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 12px;
+      border: 2px dashed #e0e0e0;
+      min-height: 150px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    
+    .output-section.filled {
+      border-color: #667eea;
+    }
+    
+    .gif-container {
+      text-align: center;
+      margin: 20px 0;
+    }
+    
+    .gif-container img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      max-height: 400px;
+    }
+    
+    .text-display {
       background: white;
       padding: 15px;
-      border-radius: 4px;
-      border: 1px solid #ddd;
-      max-height: 300px;
-      overflow-y: auto;
-      font-family: monospace;
+      border-radius: 8px;
+      margin: 10px 0;
+      border-left: 4px solid #667eea;
+      word-break: break-word;
+    }
+    
+    .text-display strong {
+      color: #667eea;
+    }
+    
+    .duration-label {
       font-size: 12px;
+      color: #999;
+      margin-top: 5px;
     }
-    #audioPlayer {
-      width: 100%;
-      margin-top: 10px;
+    
+    .record-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      background: #ff6b6b;
+      border-radius: 50%;
+      margin-right: 8px;
+      animation: pulse 1.5s infinite;
     }
-    .info {
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .record-indicator.hidden {
+      display: none;
+    }
+    
+    .info-box {
       background: #e3f2fd;
-      padding: 10px;
+      border-left: 4px solid #2196f3;
+      padding: 15px;
       border-radius: 4px;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
       font-size: 14px;
+      color: #1565c0;
+    }
+    
+    .loading {
+      text-align: center;
+      color: #667eea;
+      font-weight: 600;
+    }
+    
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .help-text {
+      font-size: 12px;
+      color: #999;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>Audio Chunk Tester</h1>
-
-  <div class="section">
-    <h3>Upload Audio File</h3>
-    <input type="file" id="audioFile" accept="audio/*" />
-    <button onclick="sendAudioFile()">Send to Server</button>
-  </div>
-
-  <div class="section">
-    <h3>Received Audio Chunks</h3>
-    <div class="info">
-      Connect to WebSocket and listen for audio chunks from the extension
+  <div class="container">
+    <h1>🤟 Sign Language Translator</h1>
+    
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('audio')">🎙️ Audio</button>
+      <button class="tab-btn" onclick="switchTab('file')">📁 Upload</button>
+      <button class="tab-btn" onclick="switchTab('text')">📝 Text</button>
     </div>
-    <button onclick="connectWebSocket()">Connect to Server</button>
-    <button class="red" onclick="disconnectWebSocket()">Disconnect</button>
-    <div id="output"></div>
+    
+    <!-- Audio Recording Tab -->
+    <div id="audio" class="tab-content active">
+      <div class="section">
+        <div class="section-title">Record Speech</div>
+        <div class="info-box">
+          📌 Click "Start Recording", speak your sentence, then click "Stop". The audio will be transcribed and converted to sign language GIF.
+        </div>
+        
+        <div class="button-group">
+          <button id="startBtn" onclick="startRecording()">
+            <span>▶️</span> Start Recording
+          </button>
+          <button id="stopBtn" class="danger" onclick="stopRecording()" style="display: none;">
+            <span>⏹️</span> Stop Recording
+          </button>
+        </div>
+        
+        <div id="audioStatus" class="status info show">Ready to record</div>
+        <div class="help-text" id="recordingTime"></div>
+      </div>
+      
+      <div class="output-section" id="audioOutput">
+        <div id="audioResult" style="color: #999; text-align: center; padding: 20px;">No audio recorded yet</div>
+      </div>
+    </div>
+    
+    <!-- File Upload Tab -->
+    <div id="file" class="tab-content">
+      <div class="section">
+        <div class="section-title">Upload Audio File</div>
+        <div class="info-box">
+          📌 Select an audio file (MP3, WAV, WebM, etc.) to transcribe and convert to sign language GIF.
+        </div>
+        
+        <div class="input-group">
+          <input type="file" id="audioFile" accept="audio/*">
+          <button onclick="sendAudioFile()">Upload & Process</button>
+        </div>
+        
+        <div id="fileStatus" class="status">Ready to upload</div>
+      </div>
+      
+      <div class="output-section" id="fileOutput">
+        <div id="fileResult" style="color: #999; text-align: center; padding: 20px;">No file processed yet</div>
+      </div>
+    </div>
+    
+    <!-- Text Input Tab -->
+    <div id="text" class="tab-content">
+      <div class="section">
+        <div class="section-title">Text Input</div>
+        <div class="info-box">
+          📌 Enter any text below to see it converted to sign language. Use spaces to separate words.
+        </div>
+        
+        <div class="input-group">
+          <input type="text" id="textInput" placeholder="Enter text (e.g., 'hello how are you')">
+          <button onclick="generateFromText()">Generate</button>
+        </div>
+        
+        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px;">
+          <label for="durationSlider" style="font-size: 12px; color: #999; white-space: nowrap;">Duration per letter:</label>
+          <input type="range" id="durationSlider" min="0.3" max="1.5" step="0.1" value="0.5">
+          <span id="durationValue" style="font-size: 12px; color: #999; min-width: 40px;">0.5s</span>
+        </div>
+        
+        <div id="textStatus" class="status info show">Ready to convert</div>
+      </div>
+      
+      <div class="output-section" id="textOutput">
+        <div id="textResult" style="color: #999; text-align: center; padding: 20px;">Enter text and click Generate</div>
+      </div>
+    </div>
+    
+    <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #f0f0f0; text-align: center; color: #999; font-size: 12px;">
+      <p>💡 Tip: Make sure you have uploaded letter images in the server's static/letter_signs directory</p>
+      <p>Server: <span id="serverUrl">http://localhost:8000</span></p>
+    </div>
   </div>
-
-  <div class="section">
-    <h3>Play Last Chunk</h3>
-    <audio id="audioPlayer" controls></audio>
-    <button onclick="playLastChunk()">Play Last Chunk</button>
-    <button onclick="downloadLastChunk()">Download Last Chunk</button>
-  </div>
-
+  
   <script>
-    let ws = null;
+    const SERVER_URL = 'http://localhost:8000';
+    let mediaRecorder;
     let audioChunks = [];
-    const output = document.getElementById('output');
-    const audioPlayer = document.getElementById('audioPlayer');
-
-    function log(msg) {
-      const timestamp = new Date().toLocaleTimeString();
-      output.innerHTML += `[${timestamp}] ${msg}<br>`;
-      output.scrollTop = output.scrollHeight;
+    let isRecording = false;
+    let recordingStartTime = null;
+    let recordingTimer = null;
+    
+    // Update duration label
+    document.getElementById('durationSlider').addEventListener('input', (e) => {
+      document.getElementById('durationValue').textContent = e.target.value + 's';
+    });
+    
+    function switchTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(el => {
+        el.classList.remove('active');
+      });
+      
+      // Deactivate all buttons
+      document.querySelectorAll('.tab-btn').forEach(el => {
+        el.classList.remove('active');
+      });
+      
+      // Show selected tab
+      document.getElementById(tabName).classList.add('active');
+      event.target.classList.add('active');
     }
-
-    function connectWebSocket() {
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        log('Already connected');
-        return;
+    
+    // ==================== AUDIO RECORDING ====================
+    async function startRecording() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+        audioChunks = [];
+        isRecording = true;
+        recordingStartTime = Date.now();
+        
+        mediaRecorder.ondataavailable = (event) => {
+          audioChunks.push(event.data);
+        };
+        
+        mediaRecorder.onstop = async () => {
+          await handleRecordingComplete();
+        };
+        
+        mediaRecorder.start();
+        
+        // Update UI
+        document.getElementById('startBtn').style.display = 'none';
+        document.getElementById('stopBtn').style.display = 'flex';
+        showStatus('audioStatus', '<span class="record-indicator"></span>Recording...', 'info');
+        
+        // Start timer
+        startRecordingTimer();
+        
+      } catch (err) {
+        console.error('Error accessing microphone:', err);
+        showStatus('audioStatus', 'Error accessing microphone: ' + err.message, 'error');
       }
-
-      ws = new WebSocket('ws://localhost:8000/ws');
-      ws.binaryType = 'arraybuffer';
-
-      ws.onopen = () => {
-        log('✅ Connected to server');
-      };
-
-      ws.onmessage = (event) => {
-        if (event.data instanceof ArrayBuffer) {
-          // Binary audio chunk
-          audioChunks.push(new Uint8Array(event.data));
-          log(`📦 Received audio chunk: ${event.data.byteLength} bytes (Total: ${audioChunks.length} chunks)`);
-        } else {
-          // Text message (ASR response)
-          try {
-            const data = JSON.parse(event.data);
-            log(`📝 ${data.type.toUpperCase()}: ${data.text}`);
-          } catch (e) {
-            log(`📨 ${event.data}`);
+    }
+    
+    function startRecordingTimer() {
+      recordingTimer = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = elapsed % 60;
+        document.getElementById('recordingTime').textContent = 
+          `Recording: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+      }, 100);
+    }
+    
+    function stopRecordingTimer() {
+      if (recordingTimer) {
+        clearInterval(recordingTimer);
+        recordingTimer = null;
+        document.getElementById('recordingTime').textContent = '';
+      }
+    }
+    
+    async function stopRecording() {
+      if (!mediaRecorder) return;
+      
+      mediaRecorder.stop();
+      isRecording = false;
+      stopRecordingTimer();
+      
+      // Update UI
+      document.getElementById('startBtn').style.display = 'flex';
+      document.getElementById('stopBtn').style.display = 'none';
+      showStatus('audioStatus', 'Processing audio...', 'info');
+    }
+    
+    async function handleRecordingComplete() {
+      try {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        console.log('Audio blob size:', audioBlob.size);
+        
+        showStatus('audioStatus', 'Transcribing...', 'info');
+        
+        const response = await fetch(`${SERVER_URL}/transcribe`, {
+          method: 'POST',
+          body: audioBlob,
+          headers: {
+            'Content-Type': 'audio/webm'
           }
+        });
+        
+        const data = await response.json();
+        console.log('Response:', data.text[0]);
+        
+        if (data.text) {
+          // Generate GIF from transcribed text
+          await generateGifFromTranscribedText(data.text[0].text);
+        } else {
+          showStatus('audioStatus', 'No text transcribed', 'error');
         }
-      };
-
-      ws.onerror = (error) => {
-        log(`❌ Error: ${error.message}`);
-      };
-
-      ws.onclose = () => {
-        log('🔌 Disconnected from server');
-      };
-    }
-
-    function disconnectWebSocket() {
-      if (ws) {
-        ws.close();
+        
+      } catch (error) {
+        console.error('Error:', error);
+        showStatus('audioStatus', 'Error processing audio: ' + error.message, 'error');
       }
     }
-
+    
+    async function generateGifFromTranscribedText(text) {
+      try {
+        const duration = 0.5; // Default duration
+        const response = await fetch(
+          `${SERVER_URL}/text-to-gif?text=${encodeURIComponent(text)}&duration=${duration}`,
+          { method: 'POST' }
+        );
+        
+        const contentType = response.headers.get('content-type');
+        const resultDiv = document.getElementById('audioResult');
+        const outputSection = document.getElementById('audioOutput');
+        
+        if (contentType && contentType.includes('image/gif')) {
+          // Response is GIF blob
+          const blob = await response.blob();
+          const gifUrl = URL.createObjectURL(blob);
+          
+          let html = '<div class="text-display"><strong>📝 Transcribed Text:</strong><br>' + escapeHtml(text) + '</div>';
+          html += '<div class="gif-container">';
+          html += '<img src="' + gifUrl + '" alt="Sign Language GIF">';
+          html += '</div>';
+          
+          resultDiv.innerHTML = html;
+          outputSection.classList.add('filled');
+          showStatus('audioStatus', '✅ Audio processed successfully!', 'success');
+        } else {
+          // Response is JSON error
+          const data = await response.json();
+          console.log('Error response:', data);
+          
+          showStatus('audioStatus', 'Error generating GIF: ' + (data.error || 'Unknown error'), 'error');
+          resultDiv.innerHTML = '<div class="text-display"><strong>📝 Transcribed Text:</strong><br>' + escapeHtml(text) + '</div><div class="text-display" style="border-left-color: #ff6b6b;"><strong>⚠️ GIF Error:</strong> ' + escapeHtml(data.error || 'Failed to generate GIF') + '</div>';
+        }
+        
+      } catch (error) {
+        console.error('Error generating GIF:', error);
+        showStatus('audioStatus', 'Error: ' + error.message, 'error');
+      }
+    }
+    
+    // ==================== FILE UPLOAD ====================
     async function sendAudioFile() {
       const fileInput = document.getElementById('audioFile');
       const file = fileInput.files[0];
-
+      
       if (!file) {
-        alert('Please select an audio file');
+        showStatus('fileStatus', 'Please select a file', 'error');
         return;
       }
-
-      if (!ws || ws.readyState !== WebSocket.OPEN) {
-        alert('Not connected to server. Click "Connect to Server" first.');
-        return;
+      
+      console.log('Sending file:', file.name, file.type, file.size);
+      
+      showStatus('fileStatus', 'Processing file...', 'info');
+      
+      try {
+        // Read file as blob
+        const arrayBuffer = await file.arrayBuffer();
+        const blob = new Blob([arrayBuffer], { type: file.type });
+        
+        // Send to transcribe endpoint
+        const response = await fetch(`${SERVER_URL}/transcribe`, {
+          method: 'POST',
+          body: blob,
+          headers: {
+            'Content-Type': file.type
+          }
+        });
+        
+        const data = await response.json();
+        console.log('Response:', data.text[0].text);
+        const resultDiv = document.getElementById('fileResult');
+        const outputSection = document.getElementById('fileOutput');
+        
+        let html = '';
+        
+        if (data.text) {
+          html += '<div class="text-display"><strong>📝 Transcribed Text:</strong><br>' + escapeHtml(data.text[0].text) + '</div>';
+        }
+        
+        if (data.gif && data.gif.success) {
+          html += '<div class="gif-container">';
+          html += '<img src="' + SERVER_URL + '/' + data.gif.gif_path.replace('/tmp/', '') + '" alt="Sign Language GIF">';
+          if (data.gif.duration) {
+            html += '<div class="duration-label">Duration: ' + data.gif.duration.toFixed(1) + 's</div>';
+          }
+          html += '</div>';
+          outputSection.classList.add('filled');
+          showStatus('fileStatus', '✅ File processed successfully!', 'success');
+        } else if (data.gif && data.gif.error) {
+          html += '<div class="text-display" style="border-left-color: #ff6b6b;"><strong>⚠️ Note:</strong> ' + escapeHtml(data.gif.error) + '</div>';
+          showStatus('fileStatus', data.gif.error, 'error');
+        } else {
+          html += '<div class="text-display"><strong>ℹ️ Info:</strong> File processed</div>';
+          showStatus('fileStatus', 'File processed', 'info');
+        }
+        
+        resultDiv.innerHTML = html;
+        
+      } catch (error) {
+        console.error('Error:', error);
+        showStatus('fileStatus', 'Error uploading file: ' + error.message, 'error');
       }
-
-      log(`📤 Sending file: ${file.name} (${file.size} bytes)`);
-
-      const buffer = await file.arrayBuffer();
-      ws.send(buffer);
-
-      log('✅ File sent to server');
     }
-
-    function playLastChunk() {
-      if (audioChunks.length === 0) {
-        alert('No audio chunks received');
+    
+    // ==================== TEXT INPUT ====================
+        async function generateFromText() {
+      const text = document.getElementById('textInput').value.trim();
+      const duration = parseFloat(document.getElementById('durationSlider').value);
+      
+      if (!text) {
+        showStatus('textStatus', 'Please enter some text', 'error');
         return;
       }
-
-      const lastChunk = audioChunks[audioChunks.length - 1];
-      const blob = new Blob([lastChunk], { type: 'audio/webm' });
-      const url = URL.createObjectURL(blob);
-
-      audioPlayer.src = url;
-      audioPlayer.play();
-
-      log(`🎵 Playing chunk #${audioChunks.length}`);
-    }
-
-    function downloadLastChunk() {
-      if (audioChunks.length === 0) {
-        alert('No audio chunks received');
-        return;
+      
+      showStatus('textStatus', 'Generating GIF...', 'info');
+      
+      try {
+        const response = await fetch(
+          `${SERVER_URL}/text-to-gif?text=${encodeURIComponent(text)}&duration=${duration}`,
+          { method: 'POST' }
+        );
+        
+        const contentType = response.headers.get('content-type');
+        const resultDiv = document.getElementById('textResult');
+        const outputSection = document.getElementById('textOutput');
+        
+        if (contentType && contentType.includes('image/gif')) {
+          // Response is GIF file
+          const blob = await response.blob();
+          const gifUrl = URL.createObjectURL(blob);
+          
+          let html = '<div class="text-display"><strong>📝 Input Text:</strong><br>' + escapeHtml(text) + '</div>';
+          html += '<div class="gif-container">';
+          html += '<img src="' + gifUrl + '" alt="Sign Language GIF">';
+          html += '</div>';
+          
+          resultDiv.innerHTML = html;
+          outputSection.classList.add('filled');
+          showStatus('textStatus', '✅ GIF generated successfully!', 'success');
+          
+        } else {
+          // Response is JSON error
+          const data = await response.json();
+          console.log('Error response:', data);
+          
+          showStatus('textStatus', 'Error: ' + (data.error || 'Unknown error'), 'error');
+          resultDiv.innerHTML = '<div class="text-display" style="border-left-color: #ff6b6b;"><strong>❌ Error:</strong> ' + escapeHtml(data.error || 'Failed to generate GIF') + '</div>';
+        }
+        
+      } catch (error) {
+        console.error('Error:', error);
+        showStatus('textStatus', 'Error generating GIF: ' + error.message, 'error');
       }
-
-      const lastChunk = audioChunks[audioChunks.length - 1];
-      const blob = new Blob([lastChunk], { type: 'audio/webm' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `chunk_${audioChunks.length}.webm`;
-      a.click();
-
-      log(`📥 Downloaded chunk #${audioChunks.length}`);
     }
+    
+    // ==================== UTILITIES ====================
+    function showStatus(elementId, message, type) {
+      const el = document.getElementById(elementId);
+      el.className = 'status show ' + type;
+      el.innerHTML = message;
+    }
+    
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // Allow Enter key in text input
+    document.getElementById('textInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        generateFromText();
+      }
+    });
   </script>
 </body>
 </html>
